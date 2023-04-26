@@ -1,0 +1,17 @@
+{
+	"name": "ls_st_datalake",
+	"properties": {
+		"annotations": [
+			"Core"
+		],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://stvocmpdevweu002.dfs.core.windows.net/"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/linkedservices"
+}

@@ -1,0 +1,628 @@
+{
+	"name": "10 SourceToRaw",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup - Get all tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[elt].[spCopySrcToRaw]",
+						"storedProcedureParameters": {
+							"process_run_date": {
+								"type": "Datetime",
+								"value": {
+									"value": "@pipeline().parameters.process_run_date",
+									"type": "Expression"
+								}
+							},
+							"process_run_id": {
+								"type": "Int32",
+								"value": {
+									"value": "1",
+									"type": "Expression"
+								}
+							},
+							"use_case_code": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.use_case_code",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_mdb_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Lookup - Get System Storage Days",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[elt].[spSystemStorageDays]",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_mdb_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach - Delete Old Data",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup - Get System Storage Days",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup - Get System Storage Days').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Delete Old Data",
+							"type": "Delete",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"dataset": {
+									"referenceName": "ds_datalake_delete",
+									"type": "DatasetReference",
+									"parameters": {
+										"folder_path": {
+											"value": "@item().FolderPath",
+											"type": "Expression"
+										}
+									}
+								},
+								"enableLogging": false,
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"modifiedDatetimeEnd": {
+										"value": "@{Adddays(utcnow(), item().StorageDays)}",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "ForEach - Source To Raw",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup - Get all tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup - Get all tables').output.value",
+						"type": "Expression"
+					},
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Switch - Choose Copy Data",
+							"type": "Switch",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"on": {
+									"value": "@item().source_system_name",
+									"type": "Expression"
+								},
+								"cases": [
+									{
+										"value": "Dyn01DataDb01A",
+										"activities": [
+											{
+												"name": "Execute Pipeline 11",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "11 SourceToRaw Dynamics",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"source_entity_structure": {
+															"value": "@json(item().source_entity_structure)",
+															"type": "Expression"
+														},
+														"source_entity_query": {
+															"value": "@item().source_entity_query",
+															"type": "Expression"
+														},
+														"sink_entity_file_name": {
+															"value": "@item().sink_entity_file_name",
+															"type": "Expression"
+														},
+														"sink_entity_folder_path": {
+															"value": "@item().sink_entity_folder_path",
+															"type": "Expression"
+														},
+														"sink_entity_structure": {
+															"value": "@json(item().sink_entity_structure)",
+															"type": "Expression"
+														},
+														"source_sink_mapping": {
+															"value": "@json(item().source_sink_mapping)",
+															"type": "Expression"
+														},
+														"process_run_id": {
+															"value": "@pipeline().parameters.process_run_id",
+															"type": "Expression"
+														}
+													}
+												}
+											},
+											{
+												"name": "spUpdateLastIncrement 11",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Execute Pipeline 11",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[elt].[spUpdateLastIncrement]",
+													"storedProcedureParameters": {
+														"source_system_name": {
+															"value": {
+																"value": "@item().source_system_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_name": {
+															"value": {
+																"value": "@item().source_entity_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_increment_column": {
+															"value": {
+																"value": "@item().source_entity_increment_column",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldb_mdb",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "spUpdateLastProcessRun 11",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "spUpdateLastIncrement 11",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[elt].[spUpdateLastProcessRun]",
+													"storedProcedureParameters": {
+														"process_run_date": {
+															"value": {
+																"value": "@pipeline().parameters.process_run_date",
+																"type": "Expression"
+															},
+															"type": "Datetime"
+														},
+														"source_system_name": {
+															"value": {
+																"value": "@item().source_system_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_name": {
+															"value": {
+																"value": "@item().source_entity_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldb_mdb",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									},
+									{
+										"value": "cmp-test",
+										"activities": [
+											{
+												"name": "Execute Pipeline 12",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "12 SourceToRaw CMP test",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"source_entity_structure": {
+															"value": "@json(item().source_entity_structure)",
+															"type": "Expression"
+														},
+														"source_entity_query": {
+															"value": "@item().source_entity_query",
+															"type": "Expression"
+														},
+														"sink_entity_file_name": {
+															"value": "@item().sink_entity_file_name",
+															"type": "Expression"
+														},
+														"sink_entity_folder_path": {
+															"value": "@item().sink_entity_folder_path",
+															"type": "Expression"
+														},
+														"sink_entity_structure": {
+															"value": "@json(item().sink_entity_structure)",
+															"type": "Expression"
+														},
+														"source_sink_mapping": {
+															"value": "@json(item().source_sink_mapping)",
+															"type": "Expression"
+														},
+														"process_run_id": {
+															"value": "@pipeline().parameters.process_run_id",
+															"type": "Expression"
+														}
+													}
+												}
+											},
+											{
+												"name": "spUpdateLastIncrement 12",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Execute Pipeline 12",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[elt].[spUpdateLastIncrement]",
+													"storedProcedureParameters": {
+														"source_system_name": {
+															"value": {
+																"value": "@item().source_system_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_name": {
+															"value": {
+																"value": "@item().source_entity_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_increment_column": {
+															"value": {
+																"value": "@item().source_entity_increment_column",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldb_mdb",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "spUpdateLastProcessRun 12",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "spUpdateLastIncrement 12",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[elt].[spUpdateLastProcessRun]",
+													"storedProcedureParameters": {
+														"process_run_date": {
+															"value": {
+																"value": "@pipeline().parameters.process_run_date",
+																"type": "Expression"
+															},
+															"type": "DateTime"
+														},
+														"source_system_name": {
+															"value": {
+																"value": "@item().source_system_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_name": {
+															"value": {
+																"value": "@item().source_entity_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldb_mdb",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									},
+									{
+										"value": "servicenow-projects",
+										"activities": [
+											{
+												"name": "Execute Pipeline 13",
+												"type": "ExecutePipeline",
+												"dependsOn": [],
+												"userProperties": [],
+												"typeProperties": {
+													"pipeline": {
+														"referenceName": "13 SourceToRaw ServiceNow Projects",
+														"type": "PipelineReference"
+													},
+													"waitOnCompletion": true,
+													"parameters": {
+														"source_entity_name": {
+															"value": "@item().source_entity_name",
+															"type": "Expression"
+														},
+														"sink_entity_folder_path": {
+															"value": "@item().sink_entity_folder_path",
+															"type": "Expression"
+														},
+														"sink_entity_file_name": {
+															"value": "@item().sink_entity_file_name",
+															"type": "Expression"
+														},
+														"source_sink_mapping": {
+															"value": "@json(item().source_sink_mapping)",
+															"type": "Expression"
+														},
+														"process_run_date": {
+															"value": "@pipeline().parameters.process_run_date",
+															"type": "Expression"
+														}
+													}
+												}
+											},
+											{
+												"name": "spUpdateLastIncrement 13",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "Execute Pipeline 13",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[elt].[spUpdateLastIncrement]",
+													"storedProcedureParameters": {
+														"source_system_name": {
+															"value": {
+																"value": "@item().source_system_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_name": {
+															"value": {
+																"value": "@item().source_entity_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_increment_column": {
+															"value": {
+																"value": "@item().source_entity_increment_column",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldb_mdb",
+													"type": "LinkedServiceReference"
+												}
+											},
+											{
+												"name": "spUpdateLastProcessRun 13",
+												"type": "SqlServerStoredProcedure",
+												"dependsOn": [
+													{
+														"activity": "spUpdateLastIncrement 13",
+														"dependencyConditions": [
+															"Succeeded"
+														]
+													}
+												],
+												"policy": {
+													"timeout": "7.00:00:00",
+													"retry": 0,
+													"retryIntervalInSeconds": 30,
+													"secureOutput": false,
+													"secureInput": false
+												},
+												"userProperties": [],
+												"typeProperties": {
+													"storedProcedureName": "[elt].[spUpdateLastProcessRun]",
+													"storedProcedureParameters": {
+														"process_run_date": {
+															"value": {
+																"value": "@pipeline().parameters.process_run_date",
+																"type": "Expression"
+															},
+															"type": "Datetime"
+														},
+														"source_system_name": {
+															"value": {
+																"value": "@item().source_system_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														},
+														"source_entity_name": {
+															"value": {
+																"value": "@item().source_entity_name",
+																"type": "Expression"
+															},
+															"type": "String"
+														}
+													}
+												},
+												"linkedServiceName": {
+													"referenceName": "ls_sqldb_mdb",
+													"type": "LinkedServiceReference"
+												}
+											}
+										]
+									}
+								]
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"process_run_id": {
+				"type": "int",
+				"defaultValue": -1
+			},
+			"process_run_date": {
+				"type": "string"
+			},
+			"use_case_code": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ELT DWH/10 SourceToRaw"
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-12-08T16:08:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

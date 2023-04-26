@@ -1,0 +1,134 @@
+{
+	"name": "Master",
+	"properties": {
+		"activities": [
+			{
+				"name": "Execute 00 MDB",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "00 MDB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"process_run_id": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"process_run_date": {
+							"value": "@pipeline().TriggerTime",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Execute 10 SourceToRaw",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute 00 MDB",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "10 SourceToRaw",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"process_run_id": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"process_run_date": {
+							"value": "@pipeline().TriggerTime",
+							"type": "Expression"
+						},
+						"use_case_code": {
+							"value": "@pipeline().parameters.use_case_code",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Execute 20 RawToStaging",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute 10 SourceToRaw",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "20 RawToStaging",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"process_run_id": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"process_run_date": {
+							"value": "@pipeline().TriggerTime",
+							"type": "Expression"
+						},
+						"use_case_code": {
+							"value": "@pipeline().parameters.use_case_code",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "Execute 30 StagingToDWH",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "Execute 20 RawToStaging",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "30 StagingToDWH",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"process_run_id": {
+							"value": "@pipeline().RunId",
+							"type": "Expression"
+						},
+						"process_run_date": {
+							"value": "@pipeline().TriggerTime",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"use_case_code": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}

@@ -1,0 +1,36 @@
+{
+	"name": "t_dynamics_daily_07_30",
+	"properties": {
+		"description": "Triggers Dynamics pipelines everyday at 7.30 am.",
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "Master",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"use_case_code": "dynamics"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Day",
+				"interval": 1,
+				"startTime": "2023-04-12T11:04:00",
+				"timeZone": "W. Europe Standard Time",
+				"schedule": {
+					"minutes": [
+						30
+					],
+					"hours": [
+						7
+					]
+				}
+			}
+		}
+	}
+}

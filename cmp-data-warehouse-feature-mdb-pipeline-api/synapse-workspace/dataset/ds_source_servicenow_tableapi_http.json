@@ -1,0 +1,32 @@
+{
+	"name": "ds_source_servicenow_tableapi_http",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_source_servicenow_tableapi_http",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"relative_api_path": {
+				"type": "string"
+			},
+			"filter_on_table": {
+				"type": "string"
+			},
+			"fields_to_include": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "@concat(dataset().relative_api_path, '?sysparm_query=name=', dataset().filter_on_table, '&sysparm_fields=', dataset().fields_to_include)",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}

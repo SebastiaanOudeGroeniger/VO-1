@@ -1,0 +1,12 @@
+{
+	"name": "ds_sql_mdb_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sqldb_mdb",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

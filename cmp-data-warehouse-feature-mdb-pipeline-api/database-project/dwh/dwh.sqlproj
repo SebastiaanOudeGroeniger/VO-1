@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>dwh</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{034f1013-0142-440e-9a0b-66b7fd9ffbff}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>dwh_dev</RootNamespace>
+    <AssemblyName>dwh_dev</AssemblyName>
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(NetCoreBuild)' != 'true' AND '$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(NetCoreBuild)' != 'true' AND '$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="elt\" />
+    <Folder Include="elt\Tables\" />
+    <Folder Include="audit\" />
+    <Folder Include="audit\Tables\" />
+    <Folder Include="Security\" />
+    <Folder Include="elt\StoredProcedures\" />
+    <Folder Include="audit\StoredProcedures\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="elt\Tables\StorageTables.sql" />
+    <Build Include="audit\Tables\ProcessRun.sql" />
+    <Build Include="audit\Tables\ProcessError.sql" />
+    <Build Include="audit\Tables\PipelineRun.sql" />
+    <Build Include="audit\Tables\DataLog.sql" />
+    <Build Include="elt\StoredProcedures\spLookupStoredProcedures.sql" />
+    <Build Include="elt\StoredProcedures\spLookupLevels.sql" />
+    <Build Include="elt\StoredProcedures\spCreateTableFromMetadata.sql" />
+    <Build Include="elt\StoredProcedures\spCreateSchema.sql" />
+    <Build Include="audit\StoredProcedures\spStartProcessRun.sql" />
+    <Build Include="audit\StoredProcedures\spStartPipelineRun.sql" />
+    <Build Include="audit\StoredProcedures\spInsertDataLogStorage.sql" />
+    <Build Include="audit\StoredProcedures\spInsertDataLogStaging.sql" />
+    <Build Include="audit\StoredProcedures\spErrorLog.sql" />
+    <Build Include="audit\StoredProcedures\spEndProcessRun.sql" />
+    <Build Include="audit\StoredProcedures\spEndPipelineRun.sql" />
+    <Build Include="Security\elt.sql" />
+    <Build Include="Security\curated.sql" />
+    <Build Include="Security\audit.sql" />
+    <Build Include="Security\authorisation.sql" />
+    <None Include="elt\StoredProcedures\Curated\cmptest.sql" />
+  </ItemGroup>
+  <Import Condition="'$(NetCoreBuild)' == 'true'" Project="$(NETCoreTargetsPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <PackageReference Condition="'$(NetCoreBuild)' == 'true'" Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
+  </ItemGroup>
+  <Target Name="BeforeBuild">
+    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
+  </Target>
+  <ItemGroup>
+    <ArtifactReference Condition="'$(NetCoreBuild)' == 'true'" Include="$(NETCoreTargetsPath)\SystemDacpacs\AzureV12\master.dacpac">
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>dwh</DatabaseVariableLiteralValue>
+    </ArtifactReference>
+    <ArtifactReference Condition="'$(NetCoreBuild)' != 'true'" Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\AzureV12\SqlSchemas\master.dacpac">
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>dwh</DatabaseVariableLiteralValue>
+    </ArtifactReference>
+  </ItemGroup>
+</Project>

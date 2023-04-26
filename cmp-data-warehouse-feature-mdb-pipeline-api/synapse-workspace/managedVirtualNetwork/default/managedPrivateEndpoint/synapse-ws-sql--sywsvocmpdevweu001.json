@@ -1,0 +1,10 @@
+{
+	"name": "synapse-ws-sql--sywsvocmpdevweu001",
+	"properties": {
+		"privateLinkResourceId": "/subscriptions/39f65c21-47e0-4565-88dc-f5ef56774287/resourceGroups/rg-vo-cmp-app-dev-weu-001/providers/Microsoft.Synapse/workspaces/sywsvocmpdevweu001",
+		"groupId": "sql",
+		"fqdns": [
+			"sywsvocmpdevweu001.8d6b3b62-4de6-416f-bc03-f1e31b34da66.sql.azuresynapse.net"
+		]
+	}
+}

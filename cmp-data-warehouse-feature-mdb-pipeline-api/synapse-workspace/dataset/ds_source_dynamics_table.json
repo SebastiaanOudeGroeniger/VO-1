@@ -1,0 +1,12 @@
+{
+	"name": "ds_source_dynamics_table",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_source_dynamics",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

@@ -1,0 +1,10 @@
+{
+    "name": "mpe_sywsvocmpdevweu001_stvocmpdevweu002_dfs",
+    "properties": {
+        "privateLinkResourceId": "/subscriptions/39f65c21-47e0-4565-88dc-f5ef56774287/resourceGroups/rg-vo-cmp-app-dev-weu-001/providers/Microsoft.Storage/storageAccounts/stvocmpdevweu002",
+        "groupId": "dfs",
+        "fqdns": [
+            "stvocmpdevweu002.dfs.core.windows.net"
+        ]
+    }
+}

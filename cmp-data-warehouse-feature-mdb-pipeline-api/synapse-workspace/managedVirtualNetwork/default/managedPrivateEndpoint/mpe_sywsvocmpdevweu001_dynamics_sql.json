@@ -1,0 +1,10 @@
+{
+    "name": "mpe_sywsvocmpdevweu001_dynamics_sql",
+    "properties": {
+        "privateLinkResourceId": "/subscriptions/edc01e04-52e9-4a28-964d-87bd7f8ae257/resourceGroups/rg-vo-dyn-db-acc-weu-001/providers/Microsoft.Sql/servers/sql-vo-dyn-acc-weu-001",
+        "groupId": "sqlServer",
+        "fqdns": [
+            "sql-vo-dyn-acc-weu-001.database.windows.net"
+        ]
+    }
+}

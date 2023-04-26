@@ -1,0 +1,12 @@
+{
+	"name": "ls_kv_cmp",
+	"properties": {
+		"annotations": [
+			"Core"
+		],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://kv-vo-cmp-dev-weu-001.vault.azure.net/"
+		}
+	}
+}

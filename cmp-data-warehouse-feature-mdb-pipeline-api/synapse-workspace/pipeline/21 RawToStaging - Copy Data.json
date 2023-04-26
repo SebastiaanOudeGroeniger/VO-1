@@ -1,0 +1,273 @@
+{
+	"name": "21 RawToStaging - Copy Data",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy Data - Blob to SQL Staging",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "sp Drop and-or Create Table",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "ParquetSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true
+						}
+					},
+					"sink": {
+						"type": "AzureSqlSink",
+						"preCopyScript": {
+							"value": "@{concat('TRUNCATE TABLE', ' ', pipeline().parameters.sink_entity_name)}",
+							"type": "Expression"
+						},
+						"writeBehavior": "insert",
+						"sqlWriterUseTableLock": false,
+						"disableMetricsCollection": false
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "ds_datalake",
+						"type": "DatasetReference",
+						"parameters": {
+							"Filesystem": "raw",
+							"FolderPath": {
+								"value": "@pipeline().parameters.source_entity_folder_path",
+								"type": "Expression"
+							},
+							"FileName": {
+								"value": "@pipeline().parameters.source_entity_file_name",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "ds_sql_dwh_table",
+						"type": "DatasetReference",
+						"parameters": {
+							"table_name": "@pipeline().parameters.entity_name",
+							"structure": {
+								"value": "@pipeline().parameters.sink_entity_structure",
+								"type": "Expression"
+							},
+							"schema": {
+								"value": "@pipeline().parameters.system_name",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			},
+			{
+				"name": "LU - Create schema script",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[elt].[spCreateSchema]",
+						"storedProcedureParameters": {
+							"system_name": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.system_name",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_mdb_table",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "sp Create Schema from script",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "LU - Create schema script",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[elt].[spCreateSchema]",
+					"storedProcedureParameters": {
+						"create_schema_script": {
+							"value": {
+								"value": "@activity('LU - Create schema script').output.firstrow.CreateSchemaStatement",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_dwh",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "LU - Drop and-or Create Table script",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "sp Create Schema from script",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[elt].[spCreateTableFromMetadata]",
+						"storedProcedureParameters": {
+							"system_name": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.system_name",
+									"type": "Expression"
+								}
+							},
+							"entity_name": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.entity_name",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_mdb_table",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "sp Drop and-or Create Table",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "LU - Drop and-or Create Table script",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[elt].[spCreateTableFromMetadata]",
+					"storedProcedureParameters": {
+						"create_table_script": {
+							"value": {
+								"value": "@activity('LU - Drop and-or Create Table script').output.firstrow.CreateTableStatement",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ls_sqldb_dwh",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"entity_name": {
+				"type": "string"
+			},
+			"system_name": {
+				"type": "string"
+			},
+			"source_entity_file_name": {
+				"type": "string"
+			},
+			"source_entity_folder_path": {
+				"type": "string"
+			},
+			"source_entity_file_structure": {
+				"type": "array"
+			},
+			"sink_entity_name": {
+				"type": "string"
+			},
+			"sink_entity_structure": {
+				"type": "array"
+			},
+			"source_sink_mapping": {
+				"type": "array"
+			},
+			"process_run_id": {
+				"type": "string"
+			},
+			"process_run_date": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ELT DWH/20 RawToStaging"
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-10-15T16:10:32Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

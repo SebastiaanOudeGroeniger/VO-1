@@ -1,0 +1,16 @@
+{
+	"name": "ls_source_cmptest",
+	"properties": {
+		"annotations": [
+			"DataSource"
+		],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sql-vo-cmp-dev-weu-001.database.windows.net;Initial Catalog=cmp-test"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

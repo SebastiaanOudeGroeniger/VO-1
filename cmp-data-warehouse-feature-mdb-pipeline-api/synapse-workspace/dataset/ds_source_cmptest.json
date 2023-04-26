@@ -1,0 +1,12 @@
+{
+	"name": "ds_source_cmptest",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_source_cmptest",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

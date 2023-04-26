@@ -1,0 +1,82 @@
+name: Deployment of Synapse workspace
+
+on:
+  push:
+    branches:
+      # Synapse development is directly integrated with git
+      - uat
+      - main
+    paths:
+      - synapse-workspace/**
+      - .github/workflows/synapseDeploy.yml
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.get_env.outputs.env }}
+    steps:
+      - id: get_env
+        run: |
+          if [[ '${{ github.head_ref || github.ref_name }}' == 'main' ]]; then
+            echo "env=Production" >> $GITHUB_OUTPUT
+          elif [[ '${{ github.head_ref || github.ref_name }}' == 'uat' ]]; then
+            echo "env=Acceptance" >> $GITHUB_OUTPUT
+          elif [[ '${{ github.head_ref || github.ref_name }}' == 'development' ]]; then
+            echo "env=Development" >> $GITHUB_OUTPUT
+          else
+            echo "env=does_not_support" >> $GITHUB_OUTPUT
+          fi
+
+  deployment:
+    runs-on: ubuntu-latest
+    needs: init
+    environment: "${{needs.init.outputs.environment}}"
+    steps:
+    - name: Pre-run | Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Pre-run | Install Azure CLI on self-hosted runner
+      run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+    - name: Pre-run | Azure login
+      uses: Azure/login@v1
+      with:
+        creds: '{
+                  "clientId":"${{ vars.SP_ID }}",
+                  "clientSecret":"${{ secrets.SP_SECRET }}",
+                  "subscriptionId":"${{ vars.SUBSCRIPTION_ID }}",
+                  "tenantId":"${{ vars.TENANT_ID }}"
+                }'
+        enable-AzPSSession: true 
+
+    - name: Pre-run | Install and cache PowerShell modules
+      uses: potatoqualitee/psmodulecache@v5.2
+      with:
+        modules-to-cache: Az.Synapse, Az.Accounts
+
+    - name: Pre-run | Disable triggers in workspace
+      shell: pwsh
+      run: |
+        .\scripts\synapse\modifyTriggers.ps1 -WorkspaceName ${{ vars.SYNAPSE_WS_NAME }} -action disable
+
+    - name: Synapse workspace deployment
+      uses: Azure/Synapse-workspace-deployment@V1.7.0
+      with:
+        TargetWorkspaceName: ${{ vars.SYNAPSE_WS_NAME }}
+        ArtifactsFolder: './synapse-workspace'
+        environment: 'Azure Public'
+        clientId: ${{ vars.SP_ID }}
+        clientSecret:  ${{ secrets.SP_SECRET }}
+        subscriptionId: ${{ vars.SUBSCRIPTION_ID }}
+        resourceGroup: ${{ vars.RESOURCE_GROUP_SYNAPSE }}
+        tenantId: ${{ vars.TENANT_ID }}
+        DeleteArtifactsNotInTemplate: 'true'
+        operation: 'validateDeploy'
+        OverrideArmParameters: './parameters/parametersUAT.yaml'
+
+    - name: Post-run | Enable triggers in workspace
+      shell: pwsh
+      run: |
+        .\scripts\synapse\modifyTriggers.ps1 -WorkspaceName ${{ env.SYNAPSE_WS_NAME }} -action enable
+      if: always()

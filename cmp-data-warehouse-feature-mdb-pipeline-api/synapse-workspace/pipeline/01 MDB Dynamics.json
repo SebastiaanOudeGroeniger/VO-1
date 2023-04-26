@@ -1,0 +1,177 @@
+{
+	"name": "01 MDB Dynamics",
+	"properties": {
+		"activities": [
+			{
+				"name": "LU_Tables",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT SCHEMA_NAME(T.schema_id) AS [SCHEMA_NAME],\n\t\tT.name AS [TABLE_NAME], \n       I.rows AS [ROWCOUNT] \nFROM   sys.tables AS T \n       INNER JOIN sys.sysindexes AS I \n               ON T.object_id = I.id \n                  AND I.indid < 2\nWHERE i.rows > 0",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_source_dynamics_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "FE_INS_Metadata",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LU_Tables",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LU_Tables').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 15,
+					"activities": [
+						{
+							"name": "LU_Structure",
+							"type": "Lookup",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat('SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ',  '''' , string(item().Table_name) , '''' , 'AND TABLE_SCHEMA = ', '''' , string(item().Schema_name) , '''' )",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"dataset": {
+									"referenceName": "ds_source_dynamics_table",
+									"type": "DatasetReference"
+								},
+								"firstRowOnly": false
+							}
+						},
+						{
+							"name": "Insert_Structure",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "LU_Structure",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 60,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[elt].[spInsertMetadata]",
+								"storedProcedureParameters": {
+									"Json": {
+										"value": {
+											"value": "@string(activity('LU_Structure').output.value)",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"lSchema": {
+										"value": {
+											"value": "@item().SCHEMA_NAME",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"lTable": {
+										"value": {
+											"value": "@item().TABLE_NAME",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SystemCode": {
+										"value": {
+											"value": "@pipeline().parameters.system_code",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SystemName": {
+										"value": {
+											"value": "@pipeline().parameters.system_name",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"SystemType": {
+										"value": {
+											"value": "@pipeline().parameters.system_type",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "ls_sqldb_mdb",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"process_run_id": {
+				"type": "string",
+				"defaultValue": "-1"
+			},
+			"system_code": {
+				"type": "string"
+			},
+			"system_name": {
+				"type": "string"
+			},
+			"system_type": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "MDB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-12-04T14:48:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

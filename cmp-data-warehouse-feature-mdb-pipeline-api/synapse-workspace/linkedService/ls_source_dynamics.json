@@ -1,0 +1,17 @@
+{
+	"name": "ls_source_dynamics",
+	"properties": {
+		"description": "The Dynamics 365 environment from the E&E tender support desk",
+		"annotations": [
+			"DataSource"
+		],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sql-vo-dyn-acc-weu-001.database.windows.net;Initial Catalog=Dyn01DataDb01A"
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

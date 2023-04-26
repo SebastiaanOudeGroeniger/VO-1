@@ -1,0 +1,108 @@
+{
+	"name": "sn_test",
+	"properties": {
+		"activities": [
+			{
+				"name": "LU_Structure",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "HttpReadSettings",
+							"requestMethod": "GET"
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "ds_source_servicenow_tableapi_http",
+						"type": "DatasetReference",
+						"parameters": {
+							"relative_api_path": "sys_dictionary",
+							"filter_on_table": "pm_project",
+							"fields_to_include": "element,internal_type,max_length,unique,mandatory"
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "LU_Structure_Type",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "LU_Structure",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[elt].[spGetFieldTypeAndDataType]",
+						"storedProcedureParameters": {
+							"json": {
+								"type": "String",
+								"value": {
+									"value": "@string(activity('LU_Structure').output.value[0].result)",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_mdb_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"parameters": {
+			"process_run_id": {
+				"type": "string",
+				"defaultValue": "-1"
+			},
+			"system_code": {
+				"type": "string",
+				"defaultValue": "snprojects"
+			},
+			"system_name": {
+				"type": "string",
+				"defaultValue": "servicenow-projects"
+			},
+			"system_type": {
+				"type": "string",
+				"defaultValue": "json"
+			}
+		},
+		"folder": {
+			"name": "MDB"
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-12-04T14:48:06Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

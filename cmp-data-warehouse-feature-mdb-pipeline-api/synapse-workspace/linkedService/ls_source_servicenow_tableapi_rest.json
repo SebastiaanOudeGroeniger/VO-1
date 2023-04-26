@@ -1,0 +1,27 @@
+{
+	"name": "ls_source_servicenow_tableapi_rest",
+	"properties": {
+		"annotations": [
+			"DataSource"
+		],
+		"type": "RestService",
+		"typeProperties": {
+			"url": "https://vanoorddev.service-now.com/api/now/table/",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Basic",
+			"userName": "vo-compass-itbm-portfolio",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "ls_kv_cmp",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "servicenow-projects-api-password"
+			}
+		},
+		"connectVia": {
+			"referenceName": "AutoResolveIntegrationRuntime",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

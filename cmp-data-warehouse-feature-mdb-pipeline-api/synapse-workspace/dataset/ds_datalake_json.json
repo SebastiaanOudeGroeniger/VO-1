@@ -1,0 +1,40 @@
+{
+	"name": "ds_datalake_json",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_st_datalake",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"Filesystem": {
+				"type": "string"
+			},
+			"FolderPath": {
+				"type": "string"
+			},
+			"FileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().FileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().FolderPath",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().Filesystem",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	}
+}

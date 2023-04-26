@@ -1,0 +1,151 @@
+{
+	"name": "20 RawToStaging",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup - TablesToCopy",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[elt].[spCopyRawToStg]",
+						"storedProcedureParameters": {
+							"pipeline_run_id": {
+								"type": "Guid",
+								"value": {
+									"value": "@pipeline().RunId",
+									"type": "Expression"
+								}
+							},
+							"process_run_date": {
+								"type": "Datetime",
+								"value": {
+									"value": "@pipeline().parameters.process_run_date",
+									"type": "Expression"
+								}
+							},
+							"use_case_code": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.use_case_code",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "ds_sql_mdb_table",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEach - StagingToRaw",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Lookup - TablesToCopy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('Lookup - TablesToCopy').output.value",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"batchCount": 50,
+					"activities": [
+						{
+							"name": "Execute Pipeline 21 RawToStaging",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "21 RawToStaging - Copy Data",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"entity_name": {
+										"value": "@item().entity_name",
+										"type": "Expression"
+									},
+									"system_name": {
+										"value": "@item().system_name",
+										"type": "Expression"
+									},
+									"source_entity_file_name": {
+										"value": "@item().source_entity_file_name",
+										"type": "Expression"
+									},
+									"source_entity_folder_path": {
+										"value": "@item().source_entity_folder_path",
+										"type": "Expression"
+									},
+									"source_entity_file_structure": {
+										"value": "@item().source_entity_structure",
+										"type": "Expression"
+									},
+									"sink_entity_name": {
+										"value": "@item().sink_entity_name",
+										"type": "Expression"
+									},
+									"sink_entity_structure": {
+										"value": "@json(item().sink_entity_structure)",
+										"type": "Expression"
+									},
+									"source_sink_mapping": {
+										"value": "@json(item().source_sink_mapping)",
+										"type": "Expression"
+									},
+									"process_run_id": {
+										"value": "@pipeline().parameters.process_run_id",
+										"type": "Expression"
+									},
+									"process_run_date": {
+										"value": "@pipeline().parameters.process_run_date",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"process_run_id": {
+				"type": "int"
+			},
+			"process_run_date": {
+				"type": "string"
+			},
+			"use_case_code": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "ELT DWH/20 RawToStaging"
+		},
+		"annotations": [],
+		"lastPublishTime": "2020-10-16T08:33:32Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,103 @@
+name: GitHub Actions for SQL database | Parallelly build and release using matrix strategy
+
+on:
+  # Uses specified branch and path
+  push:
+    branches:
+      - development
+      - uat
+      - main
+    paths:
+      - database-project/**
+      - .github/workflows/databaseDeploy.yml
+
+jobs:
+  init:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.get_env.outputs.env }}
+    steps:
+      - id: get_env
+        run: |
+          if [[ '${{ github.head_ref || github.ref_name }}' == 'main' ]]; then
+            echo "env=Production" >> $GITHUB_OUTPUT
+          elif [[ '${{ github.head_ref || github.ref_name }}' == 'uat' ]]; then
+            echo "env=Acceptance" >> $GITHUB_OUTPUT
+          elif [[ '${{ github.head_ref || github.ref_name }}' == 'development' ]]; then
+            echo "env=Development" >> $GITHUB_OUTPUT
+          else
+            echo "env=does_not_support" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+  # A matrix can be used to iterate the actions over several inputs parallelly
+    strategy:
+      matrix:
+        name: [dwh, mdb]
+       
+  # MSBuild for sqldb.sln doesn't work on windows-latest
+    runs-on: windows-2019
+    steps:
+    - name: Checkout this repository | Required to build projects
+      uses: actions/checkout@v1
+    
+    - name: Setup MSBuild | Required to build db projects
+      uses: microsoft/setup-msbuild@v1.1
+      with:
+        msbuild-architecture: x64
+    
+    - name: Build database project | Build the projects from the sln file
+      run: msbuild database-project\sqldb.sln /p:Configuration=Release
+    
+    - name: Publish build artifacts for ${{ matrix.name }} | Upload dacpac files to workflow run
+      uses: actions/upload-artifact@master
+      with:
+        name: ${{ matrix.name }}
+        path: ${{ github.workspace }}\database-project\${{ matrix.name }}\bin\Release\
+
+  # Release on the development environment
+  release:
+    runs-on: self-hosted
+    needs: [init, build]
+    environment: "${{needs.init.outputs.environment}}"
+    strategy:
+      matrix:
+        name: [dwh, mdb]
+
+    steps:
+    - name: Download the artifact for ${{ matrix.name }} | Download dacpac files on self-hosted runner
+      uses: actions/download-artifact@v2.0.6
+      with:
+        name: ${{ matrix.name }}
+        
+    - name: Download and add sqlpackage on self-hosted runner
+      run: |
+        curl "https://go.microsoft.com/fwlink/?linkid=2143497" -4 -sL -o '/tmp/sqlpackage.zip'
+        unzip /tmp/sqlpackage.zip -d $HOME/sqlpackage
+        chmod +x $HOME/sqlpackage/sqlpackage
+        sudo ln -sf $HOME/sqlpackage/sqlpackage /usr/local/bin
+        sqlpackage /version
+        
+    - name: Install Azure CLI on self-hosted runner
+      run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+    - name: Use credentials | Log in into Azure
+      uses: azure/login@v1
+      with:
+        creds: '{
+                  "clientId":"${{ vars.SP_ID }}",
+                  "clientSecret":"${{ secrets.SP_SECRET }}",
+                  "subscriptionId":"${{ vars.SUBSCRIPTION_ID }}",
+                  "tenantId":"${{ vars.TENANT_ID }}"
+                }'
+  
+    - name: Publish ${{ matrix.name }} | Publishes dacpac files to target dbs
+      uses: azure/sql-action@v2.1.1
+      with:
+        connection-string: 'Server=tcp:${{ vars.SQL_SERVER }}.database.windows.net,1433;Initial Catalog=${{ matrix.name }};Authentication=Active Directory Service Principal;User ID=${{ vars.SP_ID }};Password=${{ secrets.SP_SECRET }};'
+        path: '${{ github.workspace }}/${{ matrix.name }}.dacpac'
+        action: 'Publish'
+
+    - name: Logout from Azure 
+      run: |
+         az logout
