@@ -1,6 +1,63 @@
 {
 	"name": "Servicenow metadata",
 	"properties": {
+		"activities": [
+			{
+				"name": "ForEach1",
+				"type": "ForEach",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@createArray('pm_project', 'issue', 'pm_portfolio', 'pm_project_task', 'project_status', 'risk', 'dmn_demand')",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "Web1",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@concat('https://vanoorddev.service-now.com/api/now/table/sys_db_object?sysparm_query=name=', item())",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "GET",
+								"authentication": {
+									"type": "Basic",
+									"username": "vo-compass-itbm-portfolio",
+									"password": {
+										"type": "AzureKeyVaultSecret",
+										"store": {
+											"referenceName": "AzureKeyVault1",
+											"type": "LinkedServiceReference"
+										},
+										"secretName": "servicenow"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"variables": {
+			"wat": {
+				"type": "Array"
+			}
+		},
 		"annotations": []
 	}
 }
