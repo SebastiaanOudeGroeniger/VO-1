@@ -27,7 +27,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"url": {
-									"value": "@concat('https://vanoorddev.service-now.com/api/now/table/sys_db_object?sysparm_query=sys_id=', pipeline().parameters.sys_id)",
+									"value": "@concat('https://vanoorddev.service-now.com/api/now/table/sys_db_object?sysparm_query=sys_id=', variables('sys_id'))",
 									"type": "Expression"
 								},
 								"connectVia": {
