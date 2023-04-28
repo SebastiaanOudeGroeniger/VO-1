@@ -14,7 +14,7 @@
 					},
 					"activities": [
 						{
-							"name": "Web1",
+							"name": "Get parent of table",
 							"type": "WebActivity",
 							"dependsOn": [],
 							"policy": {
@@ -54,7 +54,7 @@
 							"type": "SetVariable",
 							"dependsOn": [
 								{
-									"activity": "Web1",
+									"activity": "Get parent of table",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -64,7 +64,7 @@
 							"typeProperties": {
 								"variableName": "sys_id",
 								"value": {
-									"value": "@activity('Web1').output.result[0]['super_class']['value']",
+									"value": "@activity('Get parent of table').output.result[0]['super_class']['value']",
 									"type": "Expression"
 								}
 							}
