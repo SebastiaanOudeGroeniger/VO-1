@@ -72,6 +72,10 @@
 									"sys_id": {
 										"value": "@activity('Get table information').output.result[0]['super_class']['value']",
 										"type": "Expression"
+									},
+									"table_name": {
+										"value": "@activity('Get table information').output.result[0]['name']",
+										"type": "Expression"
 									}
 								}
 							}
