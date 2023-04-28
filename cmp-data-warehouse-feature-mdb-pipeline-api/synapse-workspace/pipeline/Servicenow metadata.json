@@ -51,8 +51,8 @@
 							}
 						},
 						{
-							"name": "Execute metadata 2 pipeline SN",
-							"type": "ExecutePipeline",
+							"name": "If base table has parent",
+							"type": "IfCondition",
 							"dependsOn": [
 								{
 									"activity": "Get table information",
@@ -63,21 +63,35 @@
 							],
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Servicenow metadata 2",
-									"type": "PipelineReference"
+								"expression": {
+									"value": "@greater(length(string(activity('Get table information').output.result[0]['super_class'])), 0)",
+									"type": "Expression"
 								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"sys_id": {
-										"value": "@activity('Get table information').output.result[0]['super_class']['value']",
-										"type": "Expression"
-									},
-									"table_name": {
-										"value": "@activity('Get table information').output.result[0]['name']",
-										"type": "Expression"
+								"ifTrueActivities": [
+									{
+										"name": "Execute metadata 2 pipeline SN",
+										"type": "ExecutePipeline",
+										"dependsOn": [],
+										"userProperties": [],
+										"typeProperties": {
+											"pipeline": {
+												"referenceName": "Servicenow metadata 2",
+												"type": "PipelineReference"
+											},
+											"waitOnCompletion": true,
+											"parameters": {
+												"sys_id": {
+													"value": "@activity('Get table information').output.result[0]['super_class']['value']",
+													"type": "Expression"
+												},
+												"table_name": {
+													"value": "@activity('Get table information').output.result[0]['name']",
+													"type": "Expression"
+												}
+											}
+										}
 									}
-								}
+								]
 							}
 						}
 					]
