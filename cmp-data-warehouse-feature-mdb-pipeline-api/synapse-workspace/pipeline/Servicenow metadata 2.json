@@ -63,7 +63,10 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "sys_id",
-								"value": ""
+								"value": {
+									"value": "@activity('Web1').output.result[0]['super_class']['value']",
+									"type": "Expression"
+								}
 							}
 						}
 					],
