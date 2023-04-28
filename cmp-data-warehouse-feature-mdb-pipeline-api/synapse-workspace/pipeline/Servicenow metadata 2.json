@@ -3,45 +3,82 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Web1",
-				"type": "WebActivity",
+				"name": "Until1",
+				"type": "Until",
 				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
 				"userProperties": [],
 				"typeProperties": {
-					"url": {
-						"value": "@concat('https://vanoorddev.service-now.com/api/now/table/sys_db_object?sysparm_query=sys_id=', pipeline().parameters.sys_id)",
+					"expression": {
+						"value": "@empty(variables('sys_id'))",
 						"type": "Expression"
 					},
-					"connectVia": {
-						"referenceName": "AutoResolveIntegrationRuntime",
-						"type": "IntegrationRuntimeReference"
-					},
-					"method": "GET",
-					"authentication": {
-						"type": "Basic",
-						"username": "vo-compass-itbm-portfolio",
-						"password": {
-							"type": "AzureKeyVaultSecret",
-							"store": {
-								"referenceName": "AzureKeyVault1",
-								"type": "LinkedServiceReference"
+					"activities": [
+						{
+							"name": "Web1",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
 							},
-							"secretName": "servicenow"
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@concat('https://vanoorddev.service-now.com/api/now/table/sys_db_object?sysparm_query=sys_id=', pipeline().parameters.sys_id)",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "GET",
+								"authentication": {
+									"type": "Basic",
+									"username": "vo-compass-itbm-portfolio",
+									"password": {
+										"type": "AzureKeyVaultSecret",
+										"store": {
+											"referenceName": "AzureKeyVault1",
+											"type": "LinkedServiceReference"
+										},
+										"secretName": "servicenow"
+									}
+								}
+							}
+						},
+						{
+							"name": "Set sys_id",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Web1",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "sys_id",
+								"value": ""
+							}
 						}
-					}
+					],
+					"timeout": "0.12:00:00"
 				}
 			}
 		],
 		"parameters": {
 			"sys_id": {
 				"type": "string"
+			}
+		},
+		"variables": {
+			"sys_id": {
+				"type": "String"
 			}
 		},
 		"annotations": []
