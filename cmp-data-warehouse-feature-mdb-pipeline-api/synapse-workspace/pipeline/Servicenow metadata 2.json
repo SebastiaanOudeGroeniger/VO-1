@@ -122,6 +122,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
+								"storedProcedureName": "stored_proc_1",
 								"storedProcedureParameters": {
 									"value": {
 										"value": {
