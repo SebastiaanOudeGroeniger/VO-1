@@ -1,0 +1,11 @@
+{
+	"name": "Servicenow metadata 2",
+	"properties": {
+		"parameters": {
+			"sys_id": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}
