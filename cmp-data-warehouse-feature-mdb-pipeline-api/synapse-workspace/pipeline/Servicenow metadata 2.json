@@ -71,7 +71,7 @@
 							"typeProperties": {
 								"variableName": "sys_id",
 								"value": {
-									"value": "@if(greater(length(activity('Get parent of table').output.result[0]['super_class']), 0), activity('Get parent of table').output.result[0]['super_class']['value'], 'stop')",
+									"value": "@if(empty(activity('Get parent of table').output.result[0]['super_class']), 'stop', activity('Get parent of table').output.result[0]['super_class']['value'])",
 									"type": "Expression"
 								}
 							}
