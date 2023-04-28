@@ -97,7 +97,7 @@
 							"typeProperties": {
 								"variableName": "parent_tables",
 								"value": {
-									"value": "activity('Get parent of table').output.result[0]['name']",
+									"value": "@activity('Get parent of table').output.result[0]['name']",
 									"type": "Expression"
 								}
 							}
