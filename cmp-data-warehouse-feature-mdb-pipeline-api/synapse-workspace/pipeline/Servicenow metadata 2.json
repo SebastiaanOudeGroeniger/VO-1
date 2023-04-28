@@ -112,6 +112,19 @@
 						"type": "Expression"
 					}
 				}
+			},
+			{
+				"name": "Append variable2",
+				"type": "AppendVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "parent_tables",
+					"value": {
+						"value": "@pipeline().parameters.table_name",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
