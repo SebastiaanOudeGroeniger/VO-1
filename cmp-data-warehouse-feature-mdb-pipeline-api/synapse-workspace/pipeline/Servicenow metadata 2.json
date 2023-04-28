@@ -102,6 +102,9 @@
 		"variables": {
 			"sys_id": {
 				"type": "String"
+			},
+			"parent_tables": {
+				"type": "Array"
 			}
 		},
 		"annotations": []
