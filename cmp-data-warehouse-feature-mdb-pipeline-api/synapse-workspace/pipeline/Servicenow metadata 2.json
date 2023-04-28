@@ -71,26 +71,9 @@
 							"typeProperties": {
 								"variableName": "sys_id",
 								"value": {
-									"value": "@activity('Get parent of table').output.result[0]['super_class']['value']",
+									"value": "@if(contains(activity('Get parent of table').output.result[0]['super_class'], ['value']), activity('Get parent of table').output.result[0]['super_class']['value'], 'stop')",
 									"type": "Expression"
 								}
-							}
-						},
-						{
-							"name": "Set sys_id to stop",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Set sys_id",
-									"dependencyConditions": [
-										"Failed"
-									]
-								}
-							],
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "sys_id",
-								"value": "stop"
 							}
 						}
 					],
