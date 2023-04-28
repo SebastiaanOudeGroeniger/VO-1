@@ -70,7 +70,7 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"sys_id": {
-										"value": "@activity('Web1').output.result['super_class']['value']",
+										"value": "@activity('Web1').output.result[23][1]",
 										"type": "Expression"
 									}
 								}
