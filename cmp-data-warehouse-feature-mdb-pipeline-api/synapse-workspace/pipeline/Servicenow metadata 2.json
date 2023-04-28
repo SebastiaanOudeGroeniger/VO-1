@@ -117,6 +117,9 @@
 		"parameters": {
 			"sys_id": {
 				"type": "string"
+			},
+			"table_name": {
+				"type": "string"
 			}
 		},
 		"variables": {
