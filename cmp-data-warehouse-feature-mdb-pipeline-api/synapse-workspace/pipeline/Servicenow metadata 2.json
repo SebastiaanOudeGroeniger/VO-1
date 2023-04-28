@@ -70,10 +70,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "sys_id",
-								"value": {
-									"value": "@if(contains(activity('Get parent of table').output.result[0]['super_class'], ['value']), activity('Get parent of table').output.result[0]['super_class']['value'], 'stop')",
-									"type": "Expression"
-								}
+								"value": "stop"
 							}
 						}
 					],
