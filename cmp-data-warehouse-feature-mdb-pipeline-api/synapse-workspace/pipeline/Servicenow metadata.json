@@ -12,6 +12,7 @@
 						"value": "@createArray('pm_project', 'issue', 'pm_portfolio', 'pm_project_task', 'project_status', 'risk', 'dmn_demand')",
 						"type": "Expression"
 					},
+					"isSequential": false,
 					"activities": [
 						{
 							"name": "Web1",
@@ -69,7 +70,7 @@
 								"waitOnCompletion": true,
 								"parameters": {
 									"sys_id": {
-										"value": "@activity('Web1').output.results[0]['super_class']['value']",
+										"value": "@activity('Web1').output.result['super_class']['value']",
 										"type": "Expression"
 									}
 								}
