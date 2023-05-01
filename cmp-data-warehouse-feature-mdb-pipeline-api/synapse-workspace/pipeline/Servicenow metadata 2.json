@@ -163,9 +163,10 @@
 						},
 						"base_table": {
 							"value": {
-								"value": "@item()",
+								"value": "@pipeline().parameters.base_table",
 								"type": "Expression"
-							}
+							},
+							"type": "String"
 						}
 					}
 				},
