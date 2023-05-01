@@ -210,6 +210,10 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
+						"sqlReaderQuery": {
+							"value": "SELECT STRING_AGG(REPLACE(value, '\"', ''), '^OR') AS transformed_value\nFROM (\n    SELECT value FROM dbo.tables\n    CROSS APPLY OPENJSON(name)\n    WITH (value VARCHAR(50) '$')\n) AS subquery\n",
+							"type": "Expression"
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -218,39 +222,6 @@
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
-				}
-			},
-			{
-				"name": "ForEach1",
-				"type": "ForEach",
-				"dependsOn": [
-					{
-						"activity": "Lookup1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"items": {
-						"value": "@activity('Lookup1').output.value",
-						"type": "Expression"
-					},
-					"activities": [
-						{
-							"name": "Wait1",
-							"type": "Wait",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"waitTimeInSeconds": {
-									"value": "@array(item().name)",
-									"type": "Expression"
-								}
-							}
-						}
-					]
 				}
 			}
 		],
