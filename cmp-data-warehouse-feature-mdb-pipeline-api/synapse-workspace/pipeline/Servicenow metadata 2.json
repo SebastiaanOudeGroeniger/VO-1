@@ -195,6 +195,9 @@
 			},
 			"table_name": {
 				"type": "string"
+			},
+			"base_table": {
+				"type": "string"
 			}
 		},
 		"variables": {
