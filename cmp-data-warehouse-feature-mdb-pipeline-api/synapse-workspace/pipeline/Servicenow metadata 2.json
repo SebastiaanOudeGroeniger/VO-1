@@ -131,41 +131,6 @@
 						"type": "Expression"
 					}
 				}
-			},
-			{
-				"name": "Stored procedure1",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Until1",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "stored_proc_1",
-					"storedProcedureParameters": {
-						"value": {
-							"value": {
-								"value": "@variables('parent_tables')",
-								"type": "Expression"
-							}
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "ls_sqldb_dwh",
-					"type": "LinkedServiceReference"
-				}
 			}
 		],
 		"parameters": {
