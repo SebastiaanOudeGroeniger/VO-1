@@ -156,7 +156,7 @@
 					"storedProcedureParameters": {
 						"parent_tables": {
 							"value": {
-								"value": "@variables('final_array')",
+								"value": "@string(variables('final_array'))",
 								"type": "Expression"
 							},
 							"type": "String"
