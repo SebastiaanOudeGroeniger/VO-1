@@ -137,7 +137,7 @@
 							}
 						},
 						{
-							"name": "Lookup1",
+							"name": "Get all parent tables",
 							"type": "Lookup",
 							"dependsOn": [
 								{
@@ -173,11 +173,11 @@
 							}
 						},
 						{
-							"name": "Web1",
+							"name": "Get SN metadata for table and parent table",
 							"type": "WebActivity",
 							"dependsOn": [
 								{
-									"activity": "Lookup1",
+									"activity": "Get all parent tables",
 									"dependencyConditions": [
 										"Succeeded"
 									]
@@ -193,7 +193,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"url": {
-									"value": "@concat('https://vanoorddev.service-now.com/api/now/table/sys_dictionary?sysparm_query=name=', activity('Lookup1').output.value[0].transformed_value)",
+									"value": "@concat('https://vanoorddev.service-now.com/api/now/table/sys_dictionary?sysparm_query=name=', activity('Get all parent tables').output.value[0].transformed_value)",
 									"type": "Expression"
 								},
 								"connectVia": {
