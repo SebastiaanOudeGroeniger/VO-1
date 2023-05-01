@@ -67,6 +67,37 @@
 									"value": "@greater(length(string(activity('Get table information').output.result[0]['super_class'])), 0)",
 									"type": "Expression"
 								},
+								"ifFalseActivities": [
+									{
+										"name": "Stored procedure1",
+										"type": "SqlServerStoredProcedure",
+										"dependsOn": [],
+										"policy": {
+											"timeout": "0.12:00:00",
+											"retry": 0,
+											"retryIntervalInSeconds": 30,
+											"secureOutput": false,
+											"secureInput": false
+										},
+										"userProperties": [],
+										"typeProperties": {
+											"storedProcedureName": "[dbo].[insert_parent_tables]",
+											"storedProcedureParameters": {
+												"parent_tables": {
+													"value": {
+														"value": "@activity('Get table information').output.result[0]['name']",
+														"type": "Expression"
+													},
+													"type": "String"
+												}
+											}
+										},
+										"linkedServiceName": {
+											"referenceName": "AzureSqlDatabase1",
+											"type": "LinkedServiceReference"
+										}
+									}
+								],
 								"ifTrueActivities": [
 									{
 										"name": "Execute metadata 2 pipeline SN",
