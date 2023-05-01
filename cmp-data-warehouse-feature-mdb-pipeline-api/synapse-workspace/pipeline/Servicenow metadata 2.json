@@ -143,7 +143,14 @@
 						]
 					}
 				],
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "final_array",
+					"value": {
+						"value": "@variables('parent_tables')",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
