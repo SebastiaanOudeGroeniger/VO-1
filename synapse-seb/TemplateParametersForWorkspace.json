@@ -1,0 +1,114 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "synapse-seb"
+		},
+		"ls_source_cmptest_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sql-vo-cmp-dev-weu-001.database.windows.net;Initial Catalog=cmp-test"
+		},
+		"ls_source_dynamics_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sql-vo-dyn-acc-weu-001.database.windows.net;Initial Catalog=Dyn01DataDb01A"
+		},
+		"ls_sqldb_dwh_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sql-vo-cmp-dev-weu-001.database.windows.net;Initial Catalog=dwh"
+		},
+		"ls_sqldb_mdb_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=sql-vo-cmp-dev-weu-001.database.windows.net;Initial Catalog=mdb"
+		},
+		"synapse-seb-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:synapse-seb.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"sywsvocmpdevweu001-WorkspaceDefaultSqlServer_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=tcp:sywsvocmpdevweu001.sql.azuresynapse.net,1433;Initial Catalog=@{linkedService().DBName}"
+		},
+		"AzureSqlDatabase1_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=synapse-sql-seb.database.windows.net;Initial Catalog=synapse-slq"
+		},
+		"Servicenow metadata - find parent tables_webUrl": {
+			"value": ""
+		},
+		"Servicenow metadata_webUrl": {
+			"value": ""
+		},
+		"AzureKeyVault1_properties_typeProperties_baseUrl": {
+			"value": ""
+		},
+		"ls_kv_cmp_properties_typeProperties_baseUrl": {
+			"value": ""
+		},
+		"t_dynamics_daily_07_30_freq": {
+			"value": "Day"
+		},
+		"t_dynamics_daily_07_30_properties_typeProperties_recurrence_triggerSuffix": {
+			"value": 1
+		},
+		"t_dynamics_daily_07_30_properties_typeProperties_recurrence_startTime": {
+			"value": "2023-04-12T11:04:00"
+		},
+		"t_dynamics_daily_07_30_properties_typeProperties_recurrence_timeZone": {
+			"value": "W. Europe Standard Time"
+		},
+		"t_dynamics_daily_07_30_properties_typeProperties_recurrence_schedule": {
+			"value": {
+				"minutes": [
+					30
+				],
+				"hours": [
+					7
+				]
+			}
+		},
+		"t_master_daily_07_freq": {
+			"value": "Day"
+		},
+		"t_master_daily_07_properties_typeProperties_recurrence_triggerSuffix": {
+			"value": 1
+		},
+		"t_master_daily_07_properties_typeProperties_recurrence_startTime": {
+			"value": "2023-03-08T07:16:00"
+		},
+		"t_master_daily_07_properties_typeProperties_recurrence_timeZone": {
+			"value": "W. Europe Standard Time"
+		},
+		"t_master_daily_07_properties_typeProperties_recurrence_schedule": {
+			"value": {
+				"minutes": [
+					0
+				],
+				"hours": [
+					7
+				]
+			}
+		},
+		"AutoResolveIntegrationRuntime_properties_typeProperties_computeProperties": {
+			"value": {
+				"location": "AutoResolve",
+				"dataFlowProperties": {
+					"computeType": "General",
+					"coreCount": 8,
+					"timeToLive": 0
+				}
+			}
+		},
+		"mpe_sywsvocmpdevweu001_dwh_sql_properties_privateLinkResourceId": {
+			"value": "/subscriptions/39f65c21-47e0-4565-88dc-f5ef56774287/resourceGroups/rg-vo-cmp-sql-dev-weu-001/providers/Microsoft.Sql/servers/sql-vo-cmp-dev-weu-001"
+		},
+		"mpe_sywsvocmpdevweu001_dynamics_sql_properties_privateLinkResourceId": {
+			"value": "/subscriptions/edc01e04-52e9-4a28-964d-87bd7f8ae257/resourceGroups/rg-vo-dyn-db-acc-weu-001/providers/Microsoft.Sql/servers/sql-vo-dyn-acc-weu-001"
+		},
+		"mpe_sywsvocmpdevweu001_stvocmpdevweu002_blob_properties_privateLinkResourceId": {
+			"value": "/subscriptions/39f65c21-47e0-4565-88dc-f5ef56774287/resourceGroups/rg-vo-cmp-app-dev-weu-001/providers/Microsoft.Storage/storageAccounts/stvocmpdevweu002"
+		},
+		"mpe_sywsvocmpdevweu001_stvocmpdevweu002_dfs_properties_privateLinkResourceId": {
+			"value": "/subscriptions/39f65c21-47e0-4565-88dc-f5ef56774287/resourceGroups/rg-vo-cmp-app-dev-weu-001/providers/Microsoft.Storage/storageAccounts/stvocmpdevweu002"
+		},
+		"synapse-ws-sql--sywsvocmpdevweu001_properties_privateLinkResourceId": {
+			"value": "/subscriptions/39f65c21-47e0-4565-88dc-f5ef56774287/resourceGroups/rg-vo-cmp-app-dev-weu-001/providers/Microsoft.Synapse/workspaces/sywsvocmpdevweu001"
+		},
+		"synapse-ws-sqlOnDemand--sywsvocmpdevweu001_properties_privateLinkResourceId": {
+			"value": "/subscriptions/39f65c21-47e0-4565-88dc-f5ef56774287/resourceGroups/rg-vo-cmp-app-dev-weu-001/providers/Microsoft.Synapse/workspaces/sywsvocmpdevweu001"
+		}
+	}
+}
