@@ -113,7 +113,7 @@
 										"userProperties": [],
 										"typeProperties": {
 											"pipeline": {
-												"referenceName": "Servicenow metadata 2",
+												"referenceName": "Servicenow metadata - find parent tables",
 												"type": "PipelineReference"
 											},
 											"waitOnCompletion": true,
