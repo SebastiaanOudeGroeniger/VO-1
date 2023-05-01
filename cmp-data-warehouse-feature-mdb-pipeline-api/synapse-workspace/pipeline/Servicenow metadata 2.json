@@ -184,6 +184,9 @@
 				"type": "Array"
 			}
 		},
+		"folder": {
+			"name": "SN metadata"
+		},
 		"annotations": []
 	}
 }
