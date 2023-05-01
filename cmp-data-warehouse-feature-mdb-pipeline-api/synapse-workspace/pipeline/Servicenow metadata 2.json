@@ -245,7 +245,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"waitTimeInSeconds": {
-									"value": "@item()",
+									"value": "@array(item().name)",
 									"type": "Expression"
 								}
 							}
