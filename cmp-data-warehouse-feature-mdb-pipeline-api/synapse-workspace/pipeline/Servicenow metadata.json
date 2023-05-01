@@ -159,7 +159,7 @@
 								"source": {
 									"type": "AzureSqlSource",
 									"sqlReaderQuery": {
-										"value": "SELECT STRING_AGG(REPLACE(value, '\"', ''), '^OR') AS transformed_value\nFROM (\n    SELECT value FROM dbo.tables WHERE base_table = '@{item()}'\n    CROSS APPLY OPENJSON(name)\n    WITH (value VARCHAR(500) '$')\n) AS subquery",
+										"value": "SELECT STRING_AGG(REPLACE(value, '\"', ''), '^OR') AS transformed_value\nFROM (\n    SELECT name FROM dbo.tables where base_table = '@{item()}' ) as subquery \nCROSS APPLY OPENJSON(subquery.name)\n    WITH (value VARCHAR(500) '$')",
 										"type": "Expression"
 									},
 									"queryTimeout": "02:00:00",
