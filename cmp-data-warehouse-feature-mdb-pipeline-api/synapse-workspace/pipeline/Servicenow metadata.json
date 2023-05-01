@@ -125,6 +125,10 @@
 												"table_name": {
 													"value": "@activity('Get table information').output.result[0]['name']",
 													"type": "Expression"
+												},
+												"base_table": {
+													"value": "@item()",
+													"type": "Expression"
 												}
 											}
 										}
