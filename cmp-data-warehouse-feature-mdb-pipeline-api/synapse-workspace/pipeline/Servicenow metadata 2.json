@@ -160,6 +160,12 @@
 								"type": "Expression"
 							},
 							"type": "String"
+						},
+						"base_table": {
+							"value": {
+								"value": "@item()",
+								"type": "Expression"
+							}
 						}
 					}
 				},
