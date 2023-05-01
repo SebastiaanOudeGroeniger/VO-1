@@ -83,7 +83,7 @@
 							}
 						},
 						{
-							"name": "Append variable1",
+							"name": "Set table name _",
 							"type": "AppendVariable",
 							"dependsOn": [
 								{
