@@ -85,7 +85,7 @@
 											"storedProcedureParameters": {
 												"parent_tables": {
 													"value": {
-														"value": "@activity('Get table information').output.result[0]['name']",
+														"value": "@string(createArray(activity('Get table information').output.result[0]['name']))",
 														"type": "Expression"
 													},
 													"type": "String"
