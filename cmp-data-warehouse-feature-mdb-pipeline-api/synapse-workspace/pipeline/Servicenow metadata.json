@@ -199,6 +199,19 @@
 								"connectVia": {
 									"referenceName": "AutoResolveIntegrationRuntime",
 									"type": "IntegrationRuntimeReference"
+								},
+								"method": "GET",
+								"authentication": {
+									"type": "Basic",
+									"username": "vo-compass-itbm-portfolio",
+									"password": {
+										"type": "AzureKeyVaultSecret",
+										"store": {
+											"referenceName": "AzureKeyVault1",
+											"type": "LinkedServiceReference"
+										},
+										"secretName": "servicenow"
+									}
 								}
 							}
 						}
