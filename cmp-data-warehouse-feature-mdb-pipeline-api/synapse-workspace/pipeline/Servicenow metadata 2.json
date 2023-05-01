@@ -244,7 +244,10 @@
 							"dependsOn": [],
 							"userProperties": [],
 							"typeProperties": {
-								"waitTimeInSeconds": 1
+								"waitTimeInSeconds": {
+									"value": "@item()",
+									"type": "Expression"
+								}
 							}
 						}
 					]
