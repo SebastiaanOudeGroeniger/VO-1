@@ -13,7 +13,7 @@
 						]
 					},
 					{
-						"activity": "Append variable2",
+						"activity": "Set table name",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -120,7 +120,7 @@
 				}
 			},
 			{
-				"name": "Append variable2",
+				"name": "Set table name",
 				"type": "AppendVariable",
 				"dependsOn": [],
 				"userProperties": [],
