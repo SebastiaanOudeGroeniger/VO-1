@@ -150,7 +150,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT STRING_AGG(REPLACE(value, '\"', ''), '^OR') AS transformed_value\nFROM (\n    SELECT value FROM dbo.tables\n    CROSS APPLY OPENJSON(name)\n    WITH (value VARCHAR(50) '$')\n) AS subquery\n",
+						"sqlReaderQuery": "SELECT STRING_AGG(REPLACE(value, '\"', ''), '^OR') AS transformed_value\nFROM (\n    SELECT value FROM dbo.tables\n    CROSS APPLY OPENJSON(name)\n    WITH (value VARCHAR(500) '$')\n) AS subquery\n",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
