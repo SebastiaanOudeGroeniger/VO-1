@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "f16197b3-4b3f-4af2-a903-bb6bd7f08c30"
+				"spark.autotune.trackingId": "8d1d30d8-edc2-4ceb-bfd9-b0788bf0af1b"
 			}
 		},
 		"metadata": {
@@ -81,19 +81,6 @@
 					"import pandas as pd "
 				],
 				"execution_count": 81
-			},
-			{
-				"cell_type": "markdown",
-				"metadata": {
-					"nteract": {
-						"transient": {
-							"deleting": false
-						}
-					}
-				},
-				"source": [
-					""
-				]
 			},
 			{
 				"cell_type": "markdown",
