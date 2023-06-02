@@ -1,0 +1,116 @@
+{
+	"name": "Notebook 1",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"bigDataPool": {
+			"referenceName": "pool",
+			"type": "BigDataPoolReference"
+		},
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "d0393630-cb48-43af-bb2c-95448d2a42de"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"a365ComputeOptions": {
+				"id": "/subscriptions/626e167a-05c4-420f-93db-f23807630454/resourceGroups/synapse/providers/Microsoft.Synapse/workspaces/synapse-seb/bigDataPools/pool",
+				"name": "pool",
+				"type": "Spark",
+				"endpoint": "https://synapse-seb.dev.azuresynapse.net/livyApi/versions/2019-11-01-preview/sparkPools/pool",
+				"auth": {
+					"type": "AAD",
+					"authResource": "https://dev.azuresynapse.net"
+				},
+				"sparkVersion": "3.3",
+				"nodeCount": 10,
+				"cores": 4,
+				"memory": 28,
+				"automaticScaleJobs": false
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"import json\r\n",
+					"\r\n",
+					"from azure.storage.blob import ContainerClient\r\n",
+					"\r\n",
+					"\r\n",
+					"container_client = ContainerClient.from_connection_string(\r\n",
+					"\r\n",
+					"       \"DefaultEndpointsProtocol=https;AccountName=\"+accountname+\";AccountKey=\"+accountkey+\";EndpointSuffix=core.windows.net\",\r\n",
+					"\r\n",
+					"    container_name=containername\r\n",
+					"\r\n",
+					")\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"blob_list = container_client.list_blobs(name_starts_with = \"2023/05/15/00\")\r\n",
+					"\r\n",
+					"blob_list = [blob for blob in blob_list if '.json' in blob.name]\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"data_list = []\r\n",
+					"\r\n",
+					"data_dict = {}\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"for blob in blob_list:\r\n",
+					"\r\n",
+					"    blob_client = container_client.get_blob_client(blob.name)\r\n",
+					"\r\n",
+					"    blob_contents = blob_client.download_blob().readall()\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"    for line in blob_contents.decode().splitlines():\r\n",
+					"\r\n",
+					"        try:\r\n",
+					"\r\n",
+					"            data_tag = json.loads(line)['WBV079_CI']\r\n",
+					"\r\n",
+					"            data_dict['WBV079_CI'] = data_tag\r\n",
+					"\r\n",
+					"            data_list.append(data_dict)\r\n",
+					"\r\n",
+					"        except:\r\n",
+					"\r\n",
+					"            continue\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"\r\n",
+					"print(data_list)"
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
