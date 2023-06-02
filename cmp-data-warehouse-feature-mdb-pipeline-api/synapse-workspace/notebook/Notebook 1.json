@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "d0393630-cb48-43af-bb2c-95448d2a42de"
+				"spark.autotune.trackingId": "3e8f5c14-69c0-4a91-b887-33bbfd74812f"
 			}
 		},
 		"metadata": {
@@ -25,7 +25,7 @@
 			"enableDebugMode": false,
 			"kernelspec": {
 				"name": "synapse_pyspark",
-				"display_name": "python"
+				"display_name": "Synapse PySpark"
 			},
 			"language_info": {
 				"name": "python"
@@ -56,6 +56,8 @@
 					"from azure.storage.blob import ContainerClient\r\n",
 					"\r\n",
 					"\r\n",
+					"df = spark.read.load('abfss://bronze@saopco2.dfs.core.windows.net/json/', format='json')\r\n",
+					"'''\r\n",
 					"container_client = ContainerClient.from_connection_string(\r\n",
 					"\r\n",
 					"       \"DefaultEndpointsProtocol=https;AccountName=\"+accountname+\";AccountKey=\"+accountkey+\";EndpointSuffix=core.windows.net\",\r\n",
@@ -107,9 +109,10 @@
 					"\r\n",
 					"\r\n",
 					"\r\n",
-					"print(data_list)"
+					"print(data_list)\r\n",
+					"'''"
 				],
-				"execution_count": null
+				"execution_count": 1
 			}
 		]
 	}
