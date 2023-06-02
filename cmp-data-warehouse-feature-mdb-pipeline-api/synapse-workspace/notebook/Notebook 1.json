@@ -17,7 +17,7 @@
 				"spark.dynamicAllocation.enabled": "false",
 				"spark.dynamicAllocation.minExecutors": "2",
 				"spark.dynamicAllocation.maxExecutors": "2",
-				"spark.autotune.trackingId": "3e8f5c14-69c0-4a91-b887-33bbfd74812f"
+				"spark.autotune.trackingId": "f16197b3-4b3f-4af2-a903-bb6bd7f08c30"
 			}
 		},
 		"metadata": {
@@ -49,70 +49,213 @@
 		},
 		"cells": [
 			{
-				"cell_type": "code",
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
 				"source": [
-					"import json\r\n",
-					"\r\n",
-					"from azure.storage.blob import ContainerClient\r\n",
-					"\r\n",
-					"\r\n",
-					"df = spark.read.load('abfss://bronze@saopco2.dfs.core.windows.net/json/', format='json')\r\n",
-					"'''\r\n",
-					"container_client = ContainerClient.from_connection_string(\r\n",
-					"\r\n",
-					"       \"DefaultEndpointsProtocol=https;AccountName=\"+accountname+\";AccountKey=\"+accountkey+\";EndpointSuffix=core.windows.net\",\r\n",
-					"\r\n",
-					"    container_name=containername\r\n",
-					"\r\n",
-					")\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"blob_list = container_client.list_blobs(name_starts_with = \"2023/05/15/00\")\r\n",
-					"\r\n",
-					"blob_list = [blob for blob in blob_list if '.json' in blob.name]\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"data_list = []\r\n",
-					"\r\n",
-					"data_dict = {}\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"for blob in blob_list:\r\n",
-					"\r\n",
-					"    blob_client = container_client.get_blob_client(blob.name)\r\n",
-					"\r\n",
-					"    blob_contents = blob_client.download_blob().readall()\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"    for line in blob_contents.decode().splitlines():\r\n",
-					"\r\n",
-					"        try:\r\n",
-					"\r\n",
-					"            data_tag = json.loads(line)['WBV079_CI']\r\n",
-					"\r\n",
-					"            data_dict['WBV079_CI'] = data_tag\r\n",
-					"\r\n",
-					"            data_list.append(data_dict)\r\n",
-					"\r\n",
-					"        except:\r\n",
-					"\r\n",
-					"            continue\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"\r\n",
-					"print(data_list)\r\n",
-					"'''"
+					"# Import packages"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"from pyspark.sql import SparkSession\r\n",
+					"import pyspark.sql.functions as F\r\n",
+					"from pyspark.sql.types import StructType, StructField, StringType, IntegerType\r\n",
+					"import pandas as pd "
 				],
-				"execution_count": 1
+				"execution_count": 81
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					""
+				]
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Read Data in Pandas dataframe (easier to handle than Spark dataframe first)"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df = pd.read_json('abfss://bronze@saopco2.dfs.core.windows.net/json/*', lines=True)"
+				],
+				"execution_count": 86
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Filter on specific column (this should be a loop for multiple columns) and drop all empty records for this key"
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_filtered = df[['_id','WBV079_CI']].dropna()"
+				],
+				"execution_count": 125
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Convert Pandas dataframe to json and store in ADLS "
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"json= df_filtered.to_json('abfss://bronze@saopco2.dfs.core.windows.net/json_dump.json', orient=\"records\")"
+				],
+				"execution_count": 129
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Read using Spark and create view on top of it "
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"df_spark = spark.read.json('abfss://bronze@saopco2.dfs.core.windows.net/json_dump.json')\r\n",
+					"df_spark.createOrReplaceTempView(\"spark_sql_table\")"
+				],
+				"execution_count": 134
+			},
+			{
+				"cell_type": "markdown",
+				"metadata": {
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					}
+				},
+				"source": [
+					"# Now you can do Spark SQL on top of this view and get some decent results "
+				]
+			},
+			{
+				"cell_type": "code",
+				"metadata": {
+					"jupyter": {
+						"source_hidden": false,
+						"outputs_hidden": false
+					},
+					"nteract": {
+						"transient": {
+							"deleting": false
+						}
+					},
+					"microsoft": {
+						"language": "sparksql"
+					},
+					"collapsed": false
+				},
+				"source": [
+					"%%sql \r\n",
+					"\r\n",
+					"select _id.*, WBV079_CI.* from spark_sql_table;"
+				],
+				"execution_count": 135
 			}
 		]
 	}
