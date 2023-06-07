@@ -6,7 +6,7 @@
 		],
 		"type": "AzureBlobFS",
 		"typeProperties": {
-			"url": "https://stvocmpdevweu002.dfs.core.windows.net/"
+			"url": "https://saopco2.dfs.core.windows.net/"
 		},
 		"connectVia": {
 			"referenceName": "AutoResolveIntegrationRuntime",
