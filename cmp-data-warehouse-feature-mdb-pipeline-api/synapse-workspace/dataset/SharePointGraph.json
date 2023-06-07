@@ -5,6 +5,11 @@
 			"referenceName": "SharePointGraph",
 			"type": "LinkedServiceReference"
 		},
+		"parameters": {
+			"url": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "RestResource",
 		"schema": []
