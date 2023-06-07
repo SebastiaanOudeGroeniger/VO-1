@@ -6,7 +6,10 @@
 			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"url": {
+			"site_name": {
+				"type": "string"
+			},
+			"list_name": {
 				"type": "string"
 			}
 		},
@@ -14,7 +17,7 @@
 		"type": "RestResource",
 		"typeProperties": {
 			"relativeUrl": {
-				"value": "@dataset().url",
+				"value": "@concat(dataset().site_name, ':/lists/', dataset().list_name, '?expand=columns,items(expand=fields)')",
 				"type": "Expression"
 			}
 		},
