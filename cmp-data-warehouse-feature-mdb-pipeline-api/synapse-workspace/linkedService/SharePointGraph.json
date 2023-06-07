@@ -7,11 +7,12 @@
 		"typeProperties": {
 			"url": "https://graph.microsoft.com/v1.0/sites/",
 			"enableServerCertificateValidation": true,
-			"authenticationType": "AadServicePrincipal",
-			"servicePrincipalId": "e1259c80-e4b7-42d3-ab8f-25e3c2bcdbfe",
-			"tenant": "9a6fbae4-ff0a-4522-9564-de850dcba174",
-			"aadResourceId": "https://graph.microsoft.com",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIlNZTkFQU0VANDlENEVEMzItRUEwQS00RDRCLThENjMtNDM2Mzc1Nzk2QzAzX2EwZTlmM2EyLWEzZDQtNGQyZC1iN2FjLWE4NzY4YzI4NmEzNyINCn0="
+			"authenticationType": "OAuth2ClientCredential",
+			"clientId": "e1259c80-e4b7-42d3-ab8f-25e3c2bcdbfe",
+			"tokenEndpoint": "https://login.microsoftonline.com/9a6fbae4-ff0a-4522-9564-de850dcba174",
+			"scope": "https://graph.microsoft.com/.default",
+			"resource": "https://graph.microsoft.com",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIlNZTkFQU0VANDlENEVEMzItRUEwQS00RDRCLThENjMtNDM2Mzc1Nzk2QzAzXzkwZWFhNzFkLTkzNTgtNDAzNy1hZDViLWNmNzBmNGIxNDM1NCINCn0="
 		},
 		"connectVia": {
 			"referenceName": "AutoResolveIntegrationRuntime",
