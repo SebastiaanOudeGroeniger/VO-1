@@ -4,7 +4,7 @@
 		"annotations": [],
 		"type": "RestService",
 		"typeProperties": {
-			"url": "https://graph.microsoft.com/v1.0/sites/",
+			"url": "https://graph.microsoft.com/v1.0/sites/oudegroeniger.sharepoint.com:/sites",
 			"enableServerCertificateValidation": true,
 			"authenticationType": "OAuth2ClientCredential",
 			"clientId": "e1259c80-e4b7-42d3-ab8f-25e3c2bcdbfe",
