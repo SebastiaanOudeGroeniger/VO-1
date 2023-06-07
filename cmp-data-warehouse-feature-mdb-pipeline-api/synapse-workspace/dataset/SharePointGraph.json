@@ -1,0 +1,12 @@
+{
+	"name": "SharePointGraph",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SharePointGraph",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"schema": []
+	}
+}
